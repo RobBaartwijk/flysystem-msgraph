@@ -1,17 +1,17 @@
 {
-    "name": "processmaker/flysystem-msgraph",
+    "name": "bitsnbolts/flysystem-msgraph",
     "description": "A Flysystem Adapter that supports Microsoft OneDrive and Sharepoint Document Libraries using Microsoft Graph",
     "type": "library",
     "license": "MIT",
     "authors": [
         {
-            "name": "Taylor Dondich",
-            "email": "taylor@processmaker.com"
+            "name": "Thijs van den Anker",
+            "email": "thijs@bitsnbolts.nl"
         }
     ],
     "require": {
         "league/oauth2-client": "^2.4",
-        "microsoft/microsoft-graph": "dev-master",
+        "microsoftgraph/msgraph-sdk-php": "^1.26",
         "league/flysystem": "^1.0"
     },
     "autoload": {
