@@ -1,6 +1,6 @@
 <?php
 
-namespace ProcessMaker\Flysystem\Adapter;
+namespace BitsnBolts\Flysystem\Adapter;
 
 use Microsoft\Graph\Graph;
 

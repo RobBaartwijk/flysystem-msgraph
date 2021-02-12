@@ -1,14 +1,14 @@
 <?php
-namespace ProcessMaker\Flysystem\Adapter\MSGraph\Test;
+namespace BitsnBolts\Flysystem\Adapter\MSGraph\Test;
 
 use Exception;
 
 /**
  * To run the tests, you must supply your Microsoft Azure Application
- * ID and Password. This must be done via environment variables before 
+ * ID and Password. This must be done via environment variables before
  * loading the tests.
- * 
- * 
+ *
+ *
 */
 if(!getenv("test_app_id") || !getenv("test_app_password")) {
     throw new Exception("No application ID or password specified in environment.");

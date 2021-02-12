@@ -1,12 +1,12 @@
 <?php
-namespace ProcessMaker\Flysystem\Adapter\MSGraph\Test;
+namespace BitsnBolts\Flysystem\Adapter\MSGraph\Test;
 
 use League\Flysystem\Filesystem;
-use ProcessMaker\Flysystem\Adapter\MSGraph\AuthException;
-use ProcessMaker\Flysystem\Adapter\MSGraph\SiteInvalidException;
-use ProcessMaker\Flysystem\Adapter\MSGraph\ModeException;
+use BitsnBolts\Flysystem\Adapter\MSGraph\AuthException;
+use BitsnBolts\Flysystem\Adapter\MSGraph\SiteInvalidException;
+use BitsnBolts\Flysystem\Adapter\MSGraph\ModeException;
 
-use ProcessMaker\Flysystem\Adapter\MSGraph as Adapter;
+use BitsnBolts\Flysystem\Adapter\MSGraph as Adapter;
 
 class SharepointTest extends TestBase
 {
@@ -74,7 +74,7 @@ class SharepointTest extends TestBase
 
     /**
      * Tears down the test suite by attempting to delete all files written, clearing things up
-     * 
+     *
      * @todo Implement functionality
      */
     public function tearDown()

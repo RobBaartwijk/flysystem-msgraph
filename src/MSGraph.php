@@ -1,6 +1,6 @@
 <?php
 
-namespace ProcessMaker\Flysystem\Adapter;
+namespace BitsnBolts\Flysystem\Adapter;
 
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Psr7\Stream;
@@ -8,8 +8,8 @@ use League\Flysystem\Adapter\AbstractAdapter;
 use League\Flysystem\Config;
 use Microsoft\Graph\Graph;
 use Microsoft\Graph\Model;
-use ProcessMaker\Flysystem\Adapter\MSGraph\ModeException;
-use ProcessMaker\Flysystem\Adapter\MSGraph\SiteInvalidException;
+use BitsnBolts\Flysystem\Adapter\MSGraph\ModeException;
+use BitsnBolts\Flysystem\Adapter\MSGraph\SiteInvalidException;
 
 class MSGraph extends AbstractAdapter
 {
@@ -184,12 +184,15 @@ class MSGraph extends AbstractAdapter
                     ->setReturnType(Model\DriveItem::class)
                     ->execute();
 
-                $children = [];
-                foreach ($driveItems as $driveItem) {
-                    $item = $driveItem->getProperties();
-                    $item['path'] = $directory . '/' . $driveItem->getName();
-                    $children[] = $item;
-                }
+                $normalizer = [$this, 'normalizeResponse'];
+                $normalized = array_map($normalizer, $driveItems);
+                return $normalized;
+//                $children = [];
+//                foreach ($driveItems as $driveItem) {
+//                    $item = $driveItem->getProperties();
+//                    $item['path'] = $directory . '/' . $driveItem->getName();
+//                    $children[] = $item;
+//                }
 
                 return $children;
             } catch (ClientException $e) {
@@ -223,7 +226,7 @@ class MSGraph extends AbstractAdapter
     }
 
     // Write methods
-    public function write($path, $contents, Config $config)
+    public function write($path, $contents, Config $config = null)
     {
         if ($this->mode == self::MODE_SHAREPOINT) {
             // Attempt to write to sharepoint
@@ -296,7 +299,61 @@ class MSGraph extends AbstractAdapter
     {
     }
 
-    public  function setVisibility($path, $visibility)
+    public function setVisibility($path, $visibility)
     {
+    }
+
+    /**
+     * Normalize the object result array.
+     *
+     * @param array  $response
+     *
+     * @return array
+     */
+    protected function normalizeResponse($response)
+    {
+        return [
+            'path'       => $response->getName(),
+            'linkingUrl' => $response->getWebUrl(),
+            'timestamp'  => $response->getLastModifiedDateTime()->format('U'),
+            'dirname'    => $response->getParentReference()->getPath(),
+            'mimetype'   => $response->getFile()->getMimeType(),
+            'size'       => $response->getSize(),
+            'type'       => 'file',
+        ];
+    }
+
+    public function inviteUser($path, $username)
+    {
+        if ($this->mode == self::MODE_SHAREPOINT) {
+            try {
+                $data = [
+                    'requireSignIn' => true,
+                    'sendInvitation' => false,
+                    'roles' => ['read', 'write'],
+                    'recipients' => [
+                         [ "email" => $username ]
+                    ],
+                    'message' => 'Welkom'
+                ];
+                $invitation = $this->graph->createRequest('POST', $this->prefix . $path .'/invite')
+                    ->attachBody($data)
+                                         ->setReturnType(Model\SharingInvitation::class)
+                                         ->execute();
+                // Successfully retrieved meta data.
+                return $invitation;
+            } catch (ClientException $e) {
+                if ($e->getCode() == 404) {
+                    // Not found, let's return false;
+                    return false;
+                }
+
+                throw $e;
+            } catch (Exception $e) {
+                throw $e;
+            }
+        }
+
+        return false;
     }
 }

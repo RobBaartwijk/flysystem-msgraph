@@ -1,12 +1,12 @@
 {
-    "name": "bitsnbolts/flysystem-msgraph",
+    "name": "BitsnBolts/flysystem-msgraph",
     "description": "A Flysystem Adapter that supports Microsoft OneDrive and Sharepoint Document Libraries using Microsoft Graph",
     "type": "library",
     "license": "MIT",
     "authors": [
         {
             "name": "Thijs van den Anker",
-            "email": "thijs@bitsnbolts.nl"
+            "email": "thijs@BitsnBolts.nl"
         }
     ],
     "require": {
@@ -16,8 +16,8 @@
     },
     "autoload": {
         "psr-4": {
-            "ProcessMaker\\Flysystem\\Adapter\\": "src/",
-            "ProcessMaker\\Flysystem\\Adapter\\MSGraph\\Test\\": "tests/"
+            "BitsnBolts\\Flysystem\\Adapter\\": "src/",
+            "BitsnBolts\\Flysystem\\Adapter\\MSGraph\\Test\\": "tests/"
         }
     },
     "require-dev": {
