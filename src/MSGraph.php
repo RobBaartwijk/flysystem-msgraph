@@ -146,14 +146,6 @@ class MSGraph extends AbstractAdapter
                 $normalizer = [$this, 'normalizeResponse'];
                 $normalized = array_map($normalizer, $driveItems);
                 return $normalized;
-//                $children = [];
-//                foreach ($driveItems as $driveItem) {
-//                    $item = $driveItem->getProperties();
-//                    $item['path'] = $directory . '/' . $driveItem->getName();
-//                    $children[] = $item;
-//                }
-
-                return $children;
             } catch (ClientException $e) {
                 throw $e;
             } catch (Exception $e) {
