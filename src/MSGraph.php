@@ -18,68 +18,27 @@ class MSGraph extends AbstractAdapter
     const MODE_ONEDRIVE = 'onedrive';
 
     // Our mode, if sharepoint or onedrive
-    private $mode;
+    protected $mode;
 
     // Our Microsoft Graph Client
-    private $graph;
+    protected $graph;
 
     // Our Microsoft Graph Access Token
-    private $token;
+    protected $token;
 
     // Our targetId, sharepoint site if sharepoint, drive id if onedrive
-    private $targetId;
+    protected $targetId;
 
     // Our driveId, which if non empty points to a Drive
-    private $driveId;
+    protected $driveId;
 
     // Our url prefix to be used for most file operations. This gets created in our constructor
-    private $prefix;
+    protected $prefix;
 
     public function __construct($mode)
     {
         if ($mode != self::MODE_ONEDRIVE && $mode != self::MODE_SHAREPOINT) {
             throw new ModeException("Unknown mode specified: " . $mode);
-        }
-    }
-
-    public function initialize($graph, $mode = self::MODE_ONEDRIVE, $targetId, $driveName)
-    {
-        $this->mode = $mode;
-        $this->graph = $graph;
-
-        // Check for existence
-        if ($mode == self::MODE_SHAREPOINT) {
-            try {
-                $site = $this->graph->createRequest('GET', '/sites/' . $targetId)
-                    ->setReturnType(Model\Site::class)
-                    ->execute();
-                // Assign the site id triplet to our targetId
-                $this->targetId = $site->getId();
-            } catch (\Exception $e) {
-                if ($e->getCode() == 400) {
-                    throw new SiteInvalidException("The sharepoint site " . $targetId . " is invalid.");
-                }
-
-                throw $e;
-            }
-            $this->prefix = "/sites/" . $this->targetId . '/drive/items/';
-            if ($driveName != '') {
-                // Then we specified a drive name, so let's enumerate the drives and find it
-                $drives = $this->graph->createRequest('GET', '/sites/' . $this->targetId . '/drives')
-                    ->execute();
-                $drives = $drives->getBody()['value'];
-                foreach ($drives as $drive) {
-                    if ($drive['name'] == $driveName) {
-                        $this->driveId = $drive['id'];
-                        $this->prefix = "/drives/" . $this->driveId . "/items/";
-
-                        break;
-                    }
-                }
-                if (! $this->driveId) {
-                    throw new SiteInvalidException("The sharepoint drive with name " . $driveName . " could not be found.");
-                }
-            }
         }
     }
 

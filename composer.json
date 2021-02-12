@@ -1,5 +1,5 @@
 {
-    "name": "BitsnBolts/flysystem-msgraph",
+    "name": "bitsnbolts/flysystem-msgraph",
     "description": "A Flysystem Adapter that supports Microsoft OneDrive and Sharepoint Document Libraries using Microsoft Graph",
     "type": "library",
     "license": "MIT",
@@ -21,6 +21,6 @@
         }
     },
     "require-dev": {
-        "phpunit/phpunit": "^7.5"
+        "phpunit/phpunit": "^9.3.3"
     }
 }

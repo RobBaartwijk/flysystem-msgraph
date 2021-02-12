@@ -5,7 +5,7 @@ use BitsnBolts\Flysystem\Adapter\MSGraph\AuthException;
 use BitsnBolts\Flysystem\Adapter\MSGraph\SiteInvalidException;
 use BitsnBolts\Flysystem\Adapter\MSGraph\ModeException;
 
-use BitsnBolts\Flysystem\Adapter\MSGraph as Adapter;
+use BitsnBolts\Flysystem\Adapter\MSGraphAppSharepoint;
 
 class ConnectivityTest extends TestBase
 {
@@ -18,7 +18,8 @@ class ConnectivityTest extends TestBase
     public function testAuthFailure()
     {
         $this->expectException(AuthException::class);
-        $adapter = new Adapter("invalid", "invalid", OAUTH_AUTHORITY . OAUTH_TOKEN_ENDPOINT, Adapter::MODE_SHAREPOINT, "invalid");
+        $adapter = new MSGraphAppSharepoint();
+        $adapter->authorize(TENANT_ID, 'invalid', 'invalid');
     }
 
     /**
@@ -29,7 +30,9 @@ class ConnectivityTest extends TestBase
     public function testInvalidSiteSpecified()
     {
         $this->expectException(SiteInvalidException::class);
-        $adapter = new Adapter(APP_ID, APP_PASSWORD, OAUTH_AUTHORITY . OAUTH_TOKEN_ENDPOINT, Adapter::MODE_SHAREPOINT, "invalid");
+        $adapter = new MSGraphAppSharepoint();
+        $adapter->authorize(TENANT_ID, APP_ID, APP_PASSWORD);
+        $adapter->initialize('invalid', SHAREPOINT_DRIVE_NAME);
     }
 
     /**
@@ -40,7 +43,8 @@ class ConnectivityTest extends TestBase
      */
     public function testAuthSuccess()
     {
-        $adapter = new Adapter(APP_ID, APP_PASSWORD, OAUTH_AUTHORITY . OAUTH_TOKEN_ENDPOINT, Adapter::MODE_SHAREPOINT, SHAREPOINT_SITE_ID);
+        $adapter = new MSGraphAppSharepoint();
+        $adapter->authorize(TENANT_ID, APP_ID, APP_PASSWORD);
         $this->assertNotNull($adapter);
     }
 }

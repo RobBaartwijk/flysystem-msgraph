@@ -2,11 +2,12 @@
 namespace BitsnBolts\Flysystem\Adapter\MSGraph\Test;
 
 use League\Flysystem\Filesystem;
+use BitsnBolts\Flysystem\Adapter\MSGraphAppSharepoint;
 use BitsnBolts\Flysystem\Adapter\MSGraph\AuthException;
-use BitsnBolts\Flysystem\Adapter\MSGraph\SiteInvalidException;
-use BitsnBolts\Flysystem\Adapter\MSGraph\ModeException;
 
-use BitsnBolts\Flysystem\Adapter\MSGraph as Adapter;
+use BitsnBolts\Flysystem\Adapter\MSGraph\ModeException;
+use BitsnBolts\Flysystem\Adapter\MSGraph\SiteInvalidException;
+use BitsnBolts\Flysystem\Adapter\Plugins\GetUrl;
 
 class SharepointTest extends TestBase
 {
@@ -14,9 +15,12 @@ class SharepointTest extends TestBase
 
     private $filesToPurge = [];
 
-    public function setUp()
+    protected function setUp(): void
     {
-        $adapter = new Adapter(APP_ID, APP_PASSWORD, OAUTH_AUTHORITY . OAUTH_TOKEN_ENDPOINT, Adapter::MODE_SHAREPOINT, SHAREPOINT_SITE_ID);
+        parent::setUp();
+        $adapter = new MSGraphAppSharepoint();
+        $adapter->authorize(TENANT_ID, APP_ID, APP_PASSWORD);
+        $adapter->initialize(SHAREPOINT_SITE_ID, SHAREPOINT_DRIVE_NAME);
 
         $this->fs = new Filesystem($adapter);
     }
@@ -72,12 +76,24 @@ class SharepointTest extends TestBase
         $this->assertNotEmpty($this->fs->getAdapter()->getUrl(TEST_FILE_PREFIX . 'testGetUrl.txt'));
     }
 
+    public function testGetUrlPlugin()
+    {
+        $this->fs->addPlugin(new GetUrl());
+
+        $this->fs->write(TEST_FILE_PREFIX . 'testGetUrlPlugin.txt', 'testing getUrl plugin functionality');
+        $this->filesToPurge[] = TEST_FILE_PREFIX . 'testGetUrlPlugin.txt';
+
+        // Get url
+        $this->assertNotEmpty($this->fs->getAdapter()->getUrl(TEST_FILE_PREFIX . 'testGetUrlPlugin.txt'));
+    }
+
     /**
      * Tears down the test suite by attempting to delete all files written, clearing things up
      *
      * @todo Implement functionality
      */
-    public function tearDown()
+    protected function tearDown(): void
+
     {
         foreach($this->filesToPurge as $path) {
             try {
