@@ -40,6 +40,8 @@ class MSGraph extends AbstractAdapter
         if ($mode != self::MODE_ONEDRIVE && $mode != self::MODE_SHAREPOINT) {
             throw new ModeException("Unknown mode specified: " . $mode);
         }
+
+        $this->mode = $mode;
     }
 
     public function has($path)

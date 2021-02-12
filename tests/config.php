@@ -10,7 +10,7 @@ use Exception;
  *
  *
 */
-if(!getenv("test_app_id") || !getenv("test_app_password")) {
+if (!getenv("test_app_id") || !getenv("test_app_password")) {
     throw new Exception("No application ID or password specified in environment.");
 }
 

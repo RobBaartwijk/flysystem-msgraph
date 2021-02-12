@@ -2,11 +2,10 @@
 namespace BitsnBolts\Flysystem\Adapter\MSGraph\Test;
 
 use League\Flysystem\Filesystem;
+use BitsnBolts\Flysystem\Adapter\Plugins\CreateDrive;
+use BitsnBolts\Flysystem\Adapter\Plugins\DeleteDrive;
 use BitsnBolts\Flysystem\Adapter\MSGraphAppSharepoint;
-use BitsnBolts\Flysystem\Adapter\MSGraph\AuthException;
-
-use BitsnBolts\Flysystem\Adapter\MSGraph\ModeException;
-use BitsnBolts\Flysystem\Adapter\MSGraph\SiteInvalidException;
+use BitsnBolts\Flysystem\Adapter\MSGraph\DriveInvalidException;
 use BitsnBolts\Flysystem\Adapter\Plugins\GetUrl;
 
 class SharepointTest extends TestBase
@@ -33,7 +32,7 @@ class SharepointTest extends TestBase
 
     public function testDelete()
     {
-         // Create file
+        // Create file
         $this->fs->write(TEST_FILE_PREFIX . 'testDelete.txt', 'testing');
         // Ensure it exists
         $this->assertEquals(true, $this->fs->has(TEST_FILE_PREFIX . 'testDelete.txt'));
@@ -87,22 +86,36 @@ class SharepointTest extends TestBase
         $this->assertNotEmpty($this->fs->getAdapter()->getUrl(TEST_FILE_PREFIX . 'testGetUrlPlugin.txt'));
     }
 
+    public function testCreateDrive()
+    {
+        $this->fs->addPlugin(new CreateDrive());
+        $this->fs->addPlugin(new DeleteDrive());
+
+        $adapter = new MSGraphAppSharepoint();
+        $adapter->authorize(TENANT_ID, APP_ID, APP_PASSWORD);
+        $adapter->initialize(SHAREPOINT_SITE_ID);
+
+        $this->fs->createDrive('testNewDrive');
+
+        $this->assertNotNull($adapter);
+
+        $this->fs->getAdapter()->deleteDrive('testNewDrive');
+    }
+
     /**
      * Tears down the test suite by attempting to delete all files written, clearing things up
      *
      * @todo Implement functionality
      */
     protected function tearDown(): void
-
     {
-        foreach($this->filesToPurge as $path) {
+        foreach ($this->filesToPurge as $path) {
             try {
                 $this->fs->delete($path);
-            } catch(\Exception $e) {
+            } catch (\Exception $e) {
                 // Do nothing, just continue. We obviously can't clean it
             }
         }
         $this->filesToPurge = [];
     }
-
 }
