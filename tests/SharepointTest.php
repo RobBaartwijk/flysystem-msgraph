@@ -5,7 +5,6 @@ use League\Flysystem\Filesystem;
 use BitsnBolts\Flysystem\Adapter\Plugins\CreateDrive;
 use BitsnBolts\Flysystem\Adapter\Plugins\DeleteDrive;
 use BitsnBolts\Flysystem\Adapter\MSGraphAppSharepoint;
-use BitsnBolts\Flysystem\Adapter\MSGraph\DriveInvalidException;
 use BitsnBolts\Flysystem\Adapter\Plugins\GetUrl;
 
 class SharepointTest extends TestBase
@@ -86,7 +85,7 @@ class SharepointTest extends TestBase
         $this->assertNotEmpty($this->fs->getAdapter()->getUrl(TEST_FILE_PREFIX . 'testGetUrlPlugin.txt'));
     }
 
-    public function testCreateDrive()
+    public function testCreateAndDeleteDrive()
     {
         $this->fs->addPlugin(new CreateDrive());
         $this->fs->addPlugin(new DeleteDrive());
@@ -99,7 +98,7 @@ class SharepointTest extends TestBase
 
         $this->assertNotNull($adapter);
 
-        $this->fs->getAdapter()->deleteDrive('testNewDrive');
+        $this->fs->deleteDrive('testNewDrive');
     }
 
     /**

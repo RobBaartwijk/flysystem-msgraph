@@ -71,18 +71,22 @@ class MSGraphAppSharepoint extends MSGraph
 
     public function setDriveByName($driveName)
     {
+        $drive = $this->getDriveByName($driveName);
+        $this->setDrive($drive);
+    }
+
+    public function getDriveByName($driveName)
+    {
         $drives = $this->graph->createRequest('GET', '/sites/' . $this->targetId . '/drives')
             ->setReturnType(DriveItem::class)
             ->execute();
         foreach ($drives as $drive) {
             if ($drive->getName() === $driveName) {
-                $this->setDrive($drive);
-                break;
+                return $drive;
             }
         }
-        if (! $this->driveId) {
-            throw new DriveInvalidException("The sharepoint drive with name " . $driveName . " could not be found.");
-        }
+
+        throw new DriveInvalidException("The sharepoint drive with name " . $driveName . " could not be found.");
     }
 
     public function setDrive($drive)
@@ -100,6 +104,14 @@ class MSGraphAppSharepoint extends MSGraph
                 'list' => ['template' => 'documentLibrary']
             ])
             ->setReturnType(ListItem::class)
+            ->execute();
+    }
+
+    public function deleteDrive($driveName)
+    {
+        $drive = $this->getDriveByName($driveName);
+        return $this->graph
+            ->createRequest('DELETE', '/sites/' . $this->targetId . '/drive/items/' . $drive->getId())
             ->execute();
     }
 }
