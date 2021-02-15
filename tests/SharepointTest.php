@@ -101,6 +101,37 @@ class SharepointTest extends TestBase
         $this->fs->deleteDrive('testNewDrive');
     }
 
+    public function testGetMetadata()
+    {
+        // Create file
+        $this->fs->write(TEST_FILE_PREFIX . 'testMetadata.txt', 'testing metadata functionality');
+        $this->filesToPurge[] = TEST_FILE_PREFIX . 'testMetadata.txt';
+
+        // Call metadata
+        $metadata = $this->fs->getMetadata(TEST_FILE_PREFIX.'testMetadata.txt');
+        $this->assertEquals("testMetadata.txt", $metadata['path']);
+    }
+
+    public function testTimestamp()
+    {
+        // Create file
+        $this->fs->write(TEST_FILE_PREFIX . 'testTimestamp.txt', 'testing metadata functionality');
+        $this->filesToPurge[] = TEST_FILE_PREFIX . 'testTimestamp.txt';
+
+        // Call metadata
+        $this->assertIsInt($this->fs->getTimestamp(TEST_FILE_PREFIX.'testMetadata.txt'));
+    }
+
+    public function testMimetype()
+    {
+        // Create file
+        $this->fs->write(TEST_FILE_PREFIX . 'testMimetype.txt', 'testing metadata functionality');
+        $this->filesToPurge[] = TEST_FILE_PREFIX . 'testMimetype.txt';
+
+        // Call metadata
+        $this->assertEquals('text/plain', $this->fs->getMimetype(TEST_FILE_PREFIX.'testMetadata.txt'));
+    }
+
     /**
      * Tears down the test suite by attempting to delete all files written, clearing things up
      *

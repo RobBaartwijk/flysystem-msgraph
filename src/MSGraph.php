@@ -2,6 +2,7 @@
 
 namespace BitsnBolts\Flysystem\Adapter;
 
+use Microsoft\Graph\Model\DriveItem;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Psr7\Stream;
 use League\Flysystem\Adapter\AbstractAdapter;
@@ -49,7 +50,7 @@ class MSGraph extends AbstractAdapter
         if ($this->mode == self::MODE_SHAREPOINT) {
             try {
                 $driveItem = $this->graph->createRequest('GET', $this->prefix . 'root:/' . $path)
-                    ->setReturnType(Model\DriveItem::class)
+                    ->setReturnType(DriveItem::class)
                     ->execute();
                 // Successfully retrieved meta data.
                 return true;
@@ -73,7 +74,7 @@ class MSGraph extends AbstractAdapter
         if ($this->mode == self::MODE_SHAREPOINT) {
             try {
                 $driveItem = $this->graph->createRequest('GET', $this->prefix . 'root:/' . $path)
-                    ->setReturnType(Model\DriveItem::class)
+                    ->setReturnType(DriveItem::class)
                     ->execute();
                 // Successfully retrieved meta data.
                 // Now get content
@@ -108,7 +109,7 @@ class MSGraph extends AbstractAdapter
         if ($this->mode == self::MODE_SHAREPOINT) {
             try {
                 $driveItem = $this->graph->createRequest('GET', $this->prefix . 'root:/' . $path)
-                    ->setReturnType(Model\DriveItem::class)
+                    ->setReturnType(DriveItem::class)
                     ->execute();
                 // Successfully retrieved meta data.
                 // Return url property
@@ -142,7 +143,7 @@ class MSGraph extends AbstractAdapter
                 // Successfully retrieved meta data.
                 // Now get content
                 $driveItems = $this->graph->createRequest('GET', $this->prefix . $drive->getId() . '/children')
-                    ->setReturnType(Model\DriveItem::class)
+                    ->setReturnType(DriveItem::class)
                     ->execute();
 
                 $normalizer = [$this, 'normalizeResponse'];
@@ -160,6 +161,15 @@ class MSGraph extends AbstractAdapter
 
     public function getMetadata($path)
     {
+        $driveItem = $this->getDriveItem($path);
+        return $this->normalizeResponse($driveItem);
+    }
+
+    private function getDriveItem($path): DriveItem
+    {
+        return $this->graph->createRequest('GET', $this->prefix . 'root:/' . $path)
+             ->setReturnType(DriveItem::class)
+             ->execute();
     }
 
     public function getSize($path)
@@ -168,10 +178,12 @@ class MSGraph extends AbstractAdapter
 
     public function getMimetype($path)
     {
+        return $this->getMetadata($path);
     }
 
     public function getTimestamp($path)
     {
+        return $this->getMetadata($path);
     }
 
     public function getVisibility($path)
@@ -185,7 +197,7 @@ class MSGraph extends AbstractAdapter
             // Attempt to write to sharepoint
             $driveItem = $this->graph->createRequest('PUT', $this->prefix . 'root:/' . $path . ':/content')
                 ->attachBody($contents)
-                ->setReturnType(Model\DriveItem::class)
+                ->setReturnType(DriveItem::class)
                 ->execute();
 
             // Successfully created
@@ -221,7 +233,7 @@ class MSGraph extends AbstractAdapter
         if ($this->mode == self::MODE_SHAREPOINT) {
             try {
                 $driveItem = $this->graph->createRequest('GET', $this->prefix . 'root:/' . $path)
-                    ->setReturnType(Model\DriveItem::class)
+                    ->setReturnType(DriveItem::class)
                     ->execute();
                 // Successfully retrieved meta data.
                 // Now delete the file
@@ -259,11 +271,11 @@ class MSGraph extends AbstractAdapter
     /**
      * Normalize the object result array.
      *
-     * @param array  $response
+     * @param  DriveItem  $response
      *
      * @return array
      */
-    protected function normalizeResponse($response)
+    protected function normalizeResponse(DriveItem $response)
     {
         return [
             'path'       => $response->getName(),
