@@ -1,11 +1,11 @@
 <?php
 namespace BitsnBolts\Flysystem\Adapter\MSGraph\Test;
 
-use League\Flysystem\Filesystem;
+use BitsnBolts\Flysystem\Adapter\MSGraphAppSharepoint;
 use BitsnBolts\Flysystem\Adapter\Plugins\CreateDrive;
 use BitsnBolts\Flysystem\Adapter\Plugins\DeleteDrive;
-use BitsnBolts\Flysystem\Adapter\MSGraphAppSharepoint;
 use BitsnBolts\Flysystem\Adapter\Plugins\GetUrl;
+use League\Flysystem\Filesystem;
 
 class SharepointTest extends TestBase
 {
@@ -138,7 +138,7 @@ class SharepointTest extends TestBase
         $this->fs->write(TEST_FILE_PREFIX . 'testSize.txt', 'testing metadata functionality');
         $this->filesToPurge[] = TEST_FILE_PREFIX . 'testSize.txt';
 
-        // Call metadata
+        // Get the file size
         $this->assertEquals(30, $this->fs->getSize(TEST_FILE_PREFIX.'testSize.txt'));
     }
 

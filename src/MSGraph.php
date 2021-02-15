@@ -2,15 +2,13 @@
 
 namespace BitsnBolts\Flysystem\Adapter;
 
-use Microsoft\Graph\Model\DriveItem;
+use BitsnBolts\Flysystem\Adapter\MSGraph\ModeException;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Psr7\Stream;
 use League\Flysystem\Adapter\AbstractAdapter;
 use League\Flysystem\Config;
-use Microsoft\Graph\Graph;
 use Microsoft\Graph\Model;
-use BitsnBolts\Flysystem\Adapter\MSGraph\ModeException;
-use BitsnBolts\Flysystem\Adapter\MSGraph\SiteInvalidException;
+use Microsoft\Graph\Model\DriveItem;
 
 class MSGraph extends AbstractAdapter
 {
