@@ -129,7 +129,17 @@ class SharepointTest extends TestBase
         $this->filesToPurge[] = TEST_FILE_PREFIX . 'testMimetype.txt';
 
         // Call metadata
-        $this->assertEquals('text/plain', $this->fs->getMimetype(TEST_FILE_PREFIX.'testMetadata.txt'));
+        $this->assertEquals('text/plain', $this->fs->getMimetype(TEST_FILE_PREFIX.'testMimetype.txt'));
+    }
+
+    public function testSize()
+    {
+        // Create file
+        $this->fs->write(TEST_FILE_PREFIX . 'testSize.txt', 'testing metadata functionality');
+        $this->filesToPurge[] = TEST_FILE_PREFIX . 'testSize.txt';
+
+        // Call metadata
+        $this->assertEquals(30, $this->fs->getSize(TEST_FILE_PREFIX.'testSize.txt'));
     }
 
     /**

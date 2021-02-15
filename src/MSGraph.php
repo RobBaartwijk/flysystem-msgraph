@@ -174,6 +174,7 @@ class MSGraph extends AbstractAdapter
 
     public function getSize($path)
     {
+        return $this->getMetadata($path);
     }
 
     public function getMimetype($path)
