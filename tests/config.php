@@ -22,4 +22,5 @@ define("OAUTH_AUTHORIZE_ENDPOINT", getenv("test_oauth_authorize_endpoint") ? get
 define("OAUTH_TOKEN_ENDPOINT", getenv("test_oauth_token_endpoint") ? getenv("test_oauth_token_endpoint") : "/oauth2/token?api-version=1.0");
 define("SHAREPOINT_SITE_ID", getenv("test_sharepoint_site_id") ? getenv("test_sharepoint_site_id") : "example.com");
 define("SHAREPOINT_DRIVE_NAME", getenv("test_sharepoint_drive_name") ? getenv("test_sharepoint_drive_name") : "testDrive");
+define("SHAREPOINT_INVITE_USER", getenv("test_sharepoint_invite_user") ? getenv("test_sharepoint_invite_user") : "user@example.com");
 define("TEST_FILE_PREFIX", getenv("test_file_prefix") ? getenv("test_file_prefix") : "");

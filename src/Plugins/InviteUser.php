@@ -25,6 +25,6 @@ class InviteUser implements PluginInterface
         if (is_a($adapter, \League\Flysystem\Cached\CachedAdapter::class) && $adapter->getAdapter()) {
             $adapter = $adapter->getAdapter();
         }
-        $adapter->inviteUser($path, $username);
+        return $adapter->inviteUser($path, $username);
     }
 }

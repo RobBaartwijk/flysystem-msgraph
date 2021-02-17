@@ -290,6 +290,7 @@ class MSGraph extends AbstractAdapter
 
     public function inviteUser($path, $username)
     {
+        $driveItem = $this->getDriveItem($path);
         if ($this->mode == self::MODE_SHAREPOINT) {
             try {
                 $data = [
@@ -301,7 +302,7 @@ class MSGraph extends AbstractAdapter
                     ],
                     'message' => 'Welkom'
                 ];
-                $invitation = $this->graph->createRequest('POST', $this->prefix . $path .'/invite')
+                $invitation = $this->graph->createRequest('POST', $this->prefix . $driveItem->getId() .'/invite')
                     ->attachBody($data)
                                          ->setReturnType(Model\SharingInvitation::class)
                                          ->execute();

@@ -1,11 +1,12 @@
 <?php
 namespace BitsnBolts\Flysystem\Adapter\MSGraph\Test;
 
-use BitsnBolts\Flysystem\Adapter\MSGraphAppSharepoint;
+use League\Flysystem\Filesystem;
+use BitsnBolts\Flysystem\Adapter\Plugins\GetUrl;
+use BitsnBolts\Flysystem\Adapter\Plugins\InviteUser;
 use BitsnBolts\Flysystem\Adapter\Plugins\CreateDrive;
 use BitsnBolts\Flysystem\Adapter\Plugins\DeleteDrive;
-use BitsnBolts\Flysystem\Adapter\Plugins\GetUrl;
-use League\Flysystem\Filesystem;
+use BitsnBolts\Flysystem\Adapter\MSGraphAppSharepoint;
 
 class SharepointTest extends TestBase
 {
@@ -29,11 +30,6 @@ class SharepointTest extends TestBase
         $this->filesToPurge[] = TEST_FILE_PREFIX . 'testWrite.txt';
     }
 
-    /**
-     * @group test
-     *
-     * @return void
-     */
     public function testWriteStream()
     {
         $stream = fopen('php://temp', 'w+b');
@@ -114,6 +110,25 @@ class SharepointTest extends TestBase
         $this->assertNotNull($adapter);
 
         $this->fs->deleteDrive('testNewDrive');
+    }
+
+    /**
+     * @group test
+     *
+     * @return void
+     */
+    public function testInviteUser()
+    {
+        $this->fs->addPlugin(new InviteUser());
+
+        $adapter = new MSGraphAppSharepoint();
+        $adapter->authorize(TENANT_ID, APP_ID, APP_PASSWORD);
+        $adapter->initialize(SHAREPOINT_SITE_ID);
+
+        $this->assertEquals(true, $this->fs->write(TEST_FILE_PREFIX . 'testInvite.txt', 'testing'));
+        $this->filesToPurge[] = TEST_FILE_PREFIX . 'testInvite.txt';
+
+        $invite = $this->fs->inviteUser(TEST_FILE_PREFIX . 'testInvite.txt', SHAREPOINT_INVITE_USER);
     }
 
     public function testGetMetadata()
