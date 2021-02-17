@@ -25,6 +25,6 @@ class GetUrl implements PluginInterface
         if (is_a($adapter, \League\Flysystem\Cached\CachedAdapter::class) && $adapter->getAdapter()) {
             $adapter = $adapter->getAdapter();
         }
-        $adapter->getUrl($path);
+        return $adapter->getUrl($path);
     }
 }
