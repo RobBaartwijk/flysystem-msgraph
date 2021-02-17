@@ -206,8 +206,9 @@ class MSGraph extends AbstractAdapter
         return false;
     }
 
-    public function writeStream($path, $resource, Config $config)
+    public function writeStream($path, $contents, Config $config)
     {
+        return $this->write($path, stream_get_contents($contents), $config);
     }
 
     public function update($path, $contents, Config $config)

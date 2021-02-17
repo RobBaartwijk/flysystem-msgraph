@@ -29,6 +29,21 @@ class SharepointTest extends TestBase
         $this->filesToPurge[] = TEST_FILE_PREFIX . 'testWrite.txt';
     }
 
+    /**
+     * @group test
+     *
+     * @return void
+     */
+    public function testWriteStream()
+    {
+        $stream = fopen('php://temp', 'w+b');
+        fwrite($stream, 'testing');
+        rewind($stream);
+
+        $this->assertEquals(true, $this->fs->writeStream(TEST_FILE_PREFIX . 'testWriteStream.txt', $stream));
+        $this->filesToPurge[] = TEST_FILE_PREFIX . 'testWriteStream.txt';
+    }
+
     public function testDelete()
     {
         // Create file
