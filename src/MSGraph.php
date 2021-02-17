@@ -281,7 +281,8 @@ class MSGraph extends AbstractAdapter
             'path'       => $response->getName(),
             'linkingUrl' => $response->getWebUrl(),
             'timestamp'  => $response->getLastModifiedDateTime()->format('U'),
-            'dirname'    => $response->getParentReference()->getPath(),
+            'created'    => $response->getCreatedDateTime()->format('U'),
+            'dirname'    => '',
             'mimetype'   => $response->getFile()->getMimeType(),
             'size'       => $response->getSize(),
             'type'       => 'file',
@@ -319,7 +320,6 @@ class MSGraph extends AbstractAdapter
                 throw $e;
             }
         }
-
         return false;
     }
 }
