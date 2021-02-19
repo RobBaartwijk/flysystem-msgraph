@@ -49,3 +49,6 @@ through environment variables and then run the phpunit test suites.  The environ
 * OAUTH_AUTHORIZE_ENDPOINT (optional) : The OAuth2 Authorize Endpoint to use. Defaults to /oauth2/authorize?api-version=1.0
 * OAUTH_TOKEN_ENDPOINT (optional) : The OAuth2 Token Endpoint to use. Defaults to /oauth2/token?api-version=1.0
 * TEST_FILE_PREFIX (optional) : The prefix to add to all file paths for this test suite. Default to no prefix
+
+### Testing large file uploads.
+To test the large file upload, generate a large file here https://fastest.fish/generate-file and save it to `tests/files.50MB.bin`.
