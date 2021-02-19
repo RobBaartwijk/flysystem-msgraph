@@ -2,6 +2,7 @@
 
 namespace BitsnBolts\Flysystem\Adapter;
 
+use League\Flysystem\Adapter\CanOverwriteFiles;
 use BitsnBolts\Flysystem\Adapter\MSGraph\ModeException;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Psr7\Stream;
@@ -10,7 +11,7 @@ use League\Flysystem\Config;
 use Microsoft\Graph\Model;
 use Microsoft\Graph\Model\DriveItem;
 
-class MSGraph extends AbstractAdapter
+class MSGraph extends AbstractAdapter implements CanOverwriteFiles
 {
     const MODE_SHAREPOINT = 'sharepoint';
 
@@ -218,6 +219,7 @@ class MSGraph extends AbstractAdapter
 
     public function updateStream($path, $resource, Config $config)
     {
+        $this->writeStream($path, $resource, $config);
     }
 
     public function rename($path, $newpath)
