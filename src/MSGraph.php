@@ -10,6 +10,7 @@ use League\Flysystem\Adapter\AbstractAdapter;
 use League\Flysystem\Config;
 use Microsoft\Graph\Model;
 use Microsoft\Graph\Model\DriveItem;
+use Microsoft\Graph\Model\UploadSession;
 
 class MSGraph extends AbstractAdapter implements CanOverwriteFiles
 {
@@ -209,7 +210,26 @@ class MSGraph extends AbstractAdapter implements CanOverwriteFiles
 
     public function writeStream($path, $contents, Config $config)
     {
-        return $this->write($path, stream_get_contents($contents), $config);
+        $stat = fstat($contents);
+        if ($stat['size'] <= 4000000) {
+            return $this->write($path, stream_get_contents($contents), $config);
+        }
+
+        // Files over 4mb should use an upload session.
+        $uploadSession = $this->graph->createRequest('POST', $this->prefix . 'root:/' . $path . ':/createUploadSession')
+            ->setReturnType(UploadSession::class)
+            ->execute();
+
+        $guzzle = new \GuzzleHttp\Client();
+        $guzzle->put($uploadSession->getUploadUrl(), [
+            'body' => stream_get_contents($contents),
+            'headers' => [
+                'Content-Range' => $range = sprintf('bytes 0-%d/%d', $stat['size'] -1, $stat['size']),
+                'Content-Length' => $stat['size']
+            ]])
+            ->getBody()
+            ->getContents();
+        return true;
     }
 
     public function update($path, $contents, Config $config)
@@ -307,8 +327,8 @@ class MSGraph extends AbstractAdapter implements CanOverwriteFiles
                 ];
                 $invitation = $this->graph->createRequest('POST', $this->prefix . $driveItem->getId() .'/invite')
                     ->attachBody($data)
-                                         ->setReturnType(Model\SharingInvitation::class)
-                                         ->execute();
+                    ->setReturnType(Model\SharingInvitation::class)
+                    ->execute();
                 // Successfully retrieved meta data.
                 return $invitation;
             } catch (ClientException $e) {

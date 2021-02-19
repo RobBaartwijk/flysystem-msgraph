@@ -112,11 +112,6 @@ class SharepointTest extends TestBase
         $this->fs->deleteDrive('testNewDrive');
     }
 
-    /**
-     * @group test
-     *
-     * @return void
-     */
     public function testInviteUser()
     {
         $this->fs->addPlugin(new InviteUser());
@@ -170,6 +165,23 @@ class SharepointTest extends TestBase
 
         // Get the file size
         $this->assertEquals(30, $this->fs->getSize(TEST_FILE_PREFIX.'testSize.txt'));
+    }
+
+    /**
+     * @group test
+     *
+     * @return void
+     */
+    public function testLargeFileUploads()
+    {
+        // Create file
+        $path = __DIR__ . '/files/50MB.bin';
+        $this->fs->writeStream(TEST_FILE_PREFIX . 'testLargeUpload.txt', fopen($path, 'r'));
+        fclose($path);
+        $this->filesToPurge[] = TEST_FILE_PREFIX . 'testLargeUpload.txt';
+
+        // Get the file size
+        $this->assertEquals(30, $this->fs->getSize(TEST_FILE_PREFIX.'testLargeUpload.txt'));
     }
 
     /**
