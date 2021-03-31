@@ -69,6 +69,30 @@ class MSGraphAppSharepoint extends MSGraph
         }
     }
 
+    public function listContents($directory = '', $recursive = false)
+    {
+        $this->directory = $directory;
+        try {
+            $this->setDriveByName($directory);
+            $drive = $this->graph->createRequest('GET', $this->prefix . 'root:/')
+                ->setReturnType(Drive::class)
+                ->execute();
+            // Successfully retrieved meta data.
+            // Now get content
+            $driveItems = $this->graph->createRequest('GET', $this->prefix . $drive->getId() . '/children')
+                ->setReturnType(DriveItem::class)
+                ->execute();
+
+            $normalizer = [$this, 'normalizeResponse'];
+            $normalized = array_map($normalizer, $driveItems);
+            return $normalized;
+        } catch (ClientException $e) {
+            throw $e;
+        } catch (Exception $e) {
+            throw $e;
+        }
+    }
+
     public function setDriveByName($driveName)
     {
         $drive = $this->getDriveByName($driveName);

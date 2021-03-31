@@ -2,15 +2,16 @@
 
 namespace BitsnBolts\Flysystem\Adapter;
 
-use League\Flysystem\Adapter\CanOverwriteFiles;
-use BitsnBolts\Flysystem\Adapter\MSGraph\ModeException;
-use GuzzleHttp\Exception\ClientException;
-use GuzzleHttp\Psr7\Stream;
-use League\Flysystem\Adapter\AbstractAdapter;
-use League\Flysystem\Config;
+use Exception;
 use Microsoft\Graph\Model;
+use GuzzleHttp\Psr7\Stream;
+use League\Flysystem\Config;
 use Microsoft\Graph\Model\DriveItem;
 use Microsoft\Graph\Model\UploadSession;
+use GuzzleHttp\Exception\ClientException;
+use League\Flysystem\Adapter\AbstractAdapter;
+use League\Flysystem\Adapter\CanOverwriteFiles;
+use BitsnBolts\Flysystem\Adapter\MSGraph\ModeException;
 
 class MSGraph extends AbstractAdapter implements CanOverwriteFiles
 {
@@ -35,6 +36,8 @@ class MSGraph extends AbstractAdapter implements CanOverwriteFiles
 
     // Our url prefix to be used for most file operations. This gets created in our constructor
     protected $prefix;
+
+    protected $directory = '';
 
     public function __construct($mode)
     {
@@ -135,27 +138,7 @@ class MSGraph extends AbstractAdapter implements CanOverwriteFiles
 
     public function listContents($directory = '', $recursive = false)
     {
-        if ($this->mode == self::MODE_SHAREPOINT) {
-            try {
-                $drive = $this->graph->createRequest('GET', $this->prefix . 'root:/' . $directory)
-                    ->setReturnType(Model\Drive::class)
-                    ->execute();
-                // Successfully retrieved meta data.
-                // Now get content
-                $driveItems = $this->graph->createRequest('GET', $this->prefix . $drive->getId() . '/children')
-                    ->setReturnType(DriveItem::class)
-                    ->execute();
-
-                $normalizer = [$this, 'normalizeResponse'];
-                $normalized = array_map($normalizer, $driveItems);
-                return $normalized;
-            } catch (ClientException $e) {
-                throw $e;
-            } catch (Exception $e) {
-                throw $e;
-            }
-        }
-
+        // Currenlty implemented in MSGraphAppSharepoint.
         return [];
     }
 
@@ -304,7 +287,7 @@ class MSGraph extends AbstractAdapter implements CanOverwriteFiles
             'linkingUrl' => $response->getWebUrl(),
             'timestamp'  => $response->getLastModifiedDateTime()->format('U'),
             'created'    => $response->getCreatedDateTime()->format('U'),
-            'dirname'    => '',
+            'dirname'    => $this->directory,
             'mimetype'   => $response->getFile()->getMimeType(),
             'size'       => $response->getSize(),
             'type'       => 'file',
