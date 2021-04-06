@@ -175,6 +175,33 @@ class MSGraphAppSharepoint extends MSGraph
         return false;
     }
 
+    public function delete($path)
+    {
+        $this->setDriveByPath($path);
+        try {
+            $driveItem = $this->graph->createRequest('GET', $this->prefix . 'root:/' . $this->getFilenameFromPath($path))
+                ->setReturnType(DriveItem::class)
+                ->execute();
+            // Successfully retrieved meta data.
+            // Now delete the file
+            $this->graph->createRequest('DELETE', $this->prefix . $driveItem->getId())
+                ->execute();
+
+            return true;
+        } catch (ClientException $e) {
+            if ($e->getCode() == 404) {
+                // Not found, let's return false;
+                return false;
+            }
+
+            throw $e;
+        } catch (Exception $e) {
+            throw $e;
+        }
+
+        return false;
+    }
+
     public function setDriveByPath($path)
     {
         // The drive is everything before the filename.
