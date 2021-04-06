@@ -30,6 +30,12 @@ class SharepointTest extends TestBase
         $this->filesToPurge[] = TEST_FILE_PREFIX . 'testWrite.txt';
     }
 
+    public function testWriteToDirectory()
+    {
+        $this->assertEquals(true, $this->fs->write('testDir/' . TEST_FILE_PREFIX . 'testWriteInDir.txt', 'testing'));
+        $this->filesToPurge[] = 'testDir/' . TEST_FILE_PREFIX . 'testWriteInDir.txt';
+    }
+
     public function testWriteStream()
     {
         $stream = fopen('php://temp', 'w+b');
@@ -65,6 +71,28 @@ class SharepointTest extends TestBase
         $this->assertEquals(true, $this->fs->has(TEST_FILE_PREFIX . 'testHas.txt'));
     }
 
+    /** @group test */
+    public function testHasWorksWithADirectoryWhenTheDriveIsNotSetOnInitialize()
+    {
+        // Test that file does not exist
+        $this->assertEquals(false, $this->fs->has(TEST_FILE_PREFIX . 'testHasWithDirectory.txt'));
+
+        // Create file
+        $this->fs->write(TEST_FILE_PREFIX . 'testHasWithDirectory.txt', 'testing');
+        $this->filesToPurge[] = TEST_FILE_PREFIX . 'testHasWithDirectory.txt';
+
+        // Test that file exists
+        $this->assertEquals(true, $this->fs->has(TEST_FILE_PREFIX . 'testHasWithDirectory.txt'));
+
+        $adapter = new MSGraphAppSharepoint();
+        $adapter->authorize(TENANT_ID, APP_ID, APP_PASSWORD);
+        $adapter->initialize(SHAREPOINT_SITE_ID);
+
+        $fs = new Filesystem($adapter);
+        // Test that file exists
+        $this->assertEquals(true, $fs->has(SHAREPOINT_DRIVE_NAME . '/' . TEST_FILE_PREFIX . 'testHasWithDirectory.txt'));
+    }
+
     public function testRead()
     {
         // Create file
@@ -73,6 +101,25 @@ class SharepointTest extends TestBase
 
         // Call read
         $this->assertEquals("testing read functionality", $this->fs->read(TEST_FILE_PREFIX . 'testRead.txt'));
+    }
+
+    /** @group test2 */
+    public function testReadWorksWithADirectoryWhenTheDriveIsNotSetOnInitialize()
+    {
+        // Create file
+        $this->fs->write(TEST_FILE_PREFIX . 'testReadWithDirectory.txt', 'testing read functionality');
+        $this->filesToPurge[] = TEST_FILE_PREFIX . 'testReadWithDirectory.txt';
+
+        // Call read
+        $this->assertEquals("testing read functionality", $this->fs->read(TEST_FILE_PREFIX . 'testReadWithDirectory.txt'));
+
+        $adapter = new MSGraphAppSharepoint();
+        $adapter->authorize(TENANT_ID, APP_ID, APP_PASSWORD);
+        $adapter->initialize(SHAREPOINT_SITE_ID);
+
+        $fs = new Filesystem($adapter);
+        // Test that file exists
+        $this->assertEquals("testing read functionality", $fs->read(SHAREPOINT_DRIVE_NAME . '/' . TEST_FILE_PREFIX . 'testReadWithDirectory.txt'));
     }
 
     public function testGetUrl()
@@ -144,7 +191,7 @@ class SharepointTest extends TestBase
         $this->filesToPurge[] = TEST_FILE_PREFIX . 'testTimestamp.txt';
 
         // Call metadata
-        $this->assertIsInt($this->fs->getTimestamp(TEST_FILE_PREFIX.'testMetadata.txt'));
+        $this->assertIsInt($this->fs->getTimestamp(TEST_FILE_PREFIX.'testTimestamp.txt'));
     }
 
     public function testMimetype()
@@ -168,8 +215,6 @@ class SharepointTest extends TestBase
     }
 
     /**
-     * @group test
-     *
      * @return void
      */
     public function testLargeFileUploads()

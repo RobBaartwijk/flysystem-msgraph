@@ -2,16 +2,17 @@
 
 namespace BitsnBolts\Flysystem\Adapter;
 
+use stdClass;
+use Exception;
 use Microsoft\Graph\Graph;
+use GuzzleHttp\Psr7\Stream;
 use Microsoft\Graph\Model\Site;
+use Microsoft\Graph\Model\Drive;
+use Microsoft\Graph\Model\ListItem;
 use Microsoft\Graph\Model\DriveItem;
 use GuzzleHttp\Exception\ClientException;
 use BitsnBolts\Flysystem\Adapter\MSGraph\AuthException;
 use BitsnBolts\Flysystem\Adapter\MSGraph\SiteInvalidException;
-use Exception;
-use Microsoft\Graph\Model\Drive;
-use Microsoft\Graph\Model\ListItem;
-use stdClass;
 use BitsnBolts\Flysystem\Adapter\MSGraph\DriveInvalidException;
 
 class MSGraphAppSharepoint extends MSGraph
@@ -93,6 +94,98 @@ class MSGraphAppSharepoint extends MSGraph
         }
     }
 
+    public function has($path)
+    {
+        $this->setDriveByPath($path);
+        try {
+            $driveItem = $this->graph->createRequest('GET', $this->prefix . 'root:/' . $this->getFilenameFromPath($path))
+                ->setReturnType(DriveItem::class)
+                ->execute();
+            // Successfully retrieved meta data.
+            return true;
+        } catch (ClientException $e) {
+            if ($e->getCode() == 404) {
+                // Not found, let's return false;
+                return false;
+            }
+
+            throw $e;
+        } catch (Exception $e) {
+            throw $e;
+        }
+
+        return false;
+    }
+
+    public function read($path)
+    {
+        $this->setDriveByPath($path);
+        try {
+            $driveItem = $this->graph->createRequest('GET', $this->prefix . 'root:/' . $this->getFilenameFromPath($path))
+                ->setReturnType(DriveItem::class)
+                ->execute();
+            // Successfully retrieved meta data.
+            // Now get content
+            $contentStream = $this->graph->createRequest('GET', $this->prefix . $driveItem->getId() . '/content')
+                ->setReturnType(Stream::class)
+                ->execute();
+            $contents = '';
+            $bufferSize = 8012;
+            // Copy over the data into a string
+            while (! $contentStream->eof()) {
+                $contents .= $contentStream->read($bufferSize);
+            }
+
+            return ['contents' => $contents];
+        } catch (ClientException $e) {
+            if ($e->getCode() == 404) {
+                // Not found, let's return false;
+                return false;
+            }
+
+            throw $e;
+        } catch (Exception $e) {
+            throw $e;
+        }
+
+        return false;
+    }
+
+    public function getUrl($path)
+    {
+        $this->setDriveByPath($path);
+        try {
+            $driveItem = $this->graph->createRequest('GET', $this->prefix . 'root:/' . $this->getFilenameFromPath($path))
+                ->setReturnType(DriveItem::class)
+                ->execute();
+            // Successfully retrieved meta data.
+            // Return url property
+            return $driveItem->getWebUrl();
+        } catch (ClientException $e) {
+            if ($e->getCode() == 404) {
+                // Not found, let's return false;
+                return false;
+            }
+
+            throw $e;
+        } catch (Exception $e) {
+            throw $e;
+        }
+
+        return false;
+    }
+
+    public function setDriveByPath($path)
+    {
+        // The drive is everything before the filename.
+        if (!strpos($path, '/')) {
+            return;
+        }
+
+        $driveName = strstr($path, '/', true);
+        $drive = $this->setDriveByName($driveName);
+    }
+
     public function setDriveByName($driveName)
     {
         $drive = $this->getDriveByName($driveName);
@@ -137,5 +230,16 @@ class MSGraphAppSharepoint extends MSGraph
         return $this->graph
             ->createRequest('DELETE', '/sites/' . $this->targetId . '/drive/items/' . $drive->getId())
             ->execute();
+    }
+
+    protected function getFilenameFromPath($path)
+    {
+        $position = strrpos($path, '/');
+
+        if ($position === false) {
+            return $path;
+        }
+
+        return substr($path, $position + strlen('/'));
     }
 }
