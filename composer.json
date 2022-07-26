@@ -1,5 +1,5 @@
 {
-    "name": "rbaartwijk/flysystem-msgraph",
+    "name": "robbaartwijk/flysystem-msgraph",
     "description": "A Flysystem Adapter that supports Microsoft OneDrive and Sharepoint Document Libraries using Microsoft Graph",
     "type": "library",
     "license": "MIT",
